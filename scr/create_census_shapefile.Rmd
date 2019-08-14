@@ -67,14 +67,14 @@ save as RDS file
 
 ```{r}
 
-saveRDS(bc_da, here("geography", "geog_bc", "bc_da.RDS"))
+saveRDS(bc_da, here("geography", "bc_geog", "bc_da.RDS"))
 
 ```
 
 
 ```{r eval=FALSE}
 
-bc_da <- readRDS(here("geography", "geog_bc", "bc_da.RDS"))
+bc_da <- readRDS(here("geography", "bc_geog", "bc_da.RDS"))
 
 ```
 
@@ -123,7 +123,7 @@ bc_ct <-
 fct_count(bc_ct$PRUID)
 
 
-saveRDS(bc_ct, here("geography", "geog_bc", "bc_ct.RDS"))
+saveRDS(bc_ct, here("geography", "bc_geog", "bc_ct.RDS"))
 
 
 # -- function
@@ -144,7 +144,7 @@ bcgeofile("ct")
 
 ```{r eval=FALSE}
 
-bc_ct <- readRDS(here("geography", "geog_bc", glue("bc_", ct, ".RDS"))
+bc_ct <- readRDS(here("geography", "bc_geog", glue("bc_", ct, ".RDS"))
 
 ```
 
@@ -180,14 +180,14 @@ bc_cma <-
 fct_count(bc_cma$PRUID)
 
 
-saveRDS(bc_cma, here("geography", "geog_bc", "bc_cma.RDS"))
+saveRDS(bc_cma, here("geography", "bc_geog", "bc_cma.RDS"))
 
 ```
 
 
 ```{r eval=FALSE}
 
-bc_cma <- readRDS(here("geography", "geog_bc", "bc_cma.RDS"))
+bc_cma <- readRDS(here("geography", "bc_geog", "bc_cma.RDS"))
 
 
 ```

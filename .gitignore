@@ -42,3 +42,4 @@ rsconnect/
 /geography/
 # output from notebook
 *.html   
+.Rproj.user
