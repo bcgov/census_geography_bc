@@ -96,9 +96,13 @@ geolevel <- "ct"
 assign(glue("canada_", geolevel), 
        readgeofile(geolevel))
 
-saveRDS(canada_ct, 
-        here("geography", glue(geolevel, "_canada"), glue("canada_", geolevel, ".RDS")))
+geog_obj <- glue("canada_", geolevel)
 
+saveRDS(canada_ct, 
+        here("geography", glue(geolevel, "_canada"), glue(geog_obj, ".RDS")))
+
+# how can we use the `geo_obj` name to refer to the object of that name?
+# down this path lies enquo and bang-bang, or a twist on assign, or...
 
 ```
 
