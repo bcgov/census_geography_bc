@@ -96,7 +96,7 @@ geolevel <- "ct"
 assign(glue("canada_", geolevel), 
        readgeofile(geolevel))
 
-saveRDS(glue("canada_", geolevel), 
+saveRDS(canada_ct, 
         here("geography", glue(geolevel, "_canada"), glue("canada_", geolevel, ".RDS")))
 
 
