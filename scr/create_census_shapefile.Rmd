@@ -14,8 +14,6 @@ library(glue)
 
 # utilities
 library(here)
-here::here()
-library(feather)
 
 # mapping
 library(sf)

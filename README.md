@@ -10,21 +10,74 @@ census_geography_bc
 
 ### Usage
 
-Describe data being used (links), and how to run. Eg:
+These scripts take geographic boundary files made available by Statistics Canada (under the [Statistics Canada Open License](https://www.statcan.gc.ca/eng/reference/licence)), and convert them to .RDS files, which can be read into R and used for mapping etc.
 
-There are four core scripts that are required for the analysis, they need to be run in order:
+Boundary files should be downloaded from this site:
 
--   01\_clean.R
--   02\_analysis.R
--   03\_visualize.R
--   04\_output.R
+* [Boundary files](https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-eng.cfm)
 
-#### Example
 
-This is a basic example which shows you how to solve a common problem:
+Folder structure within this project is 
+
+* \scr\ -- for scripts
+
+* \geography\ 
+
+  - \(geolevel)_canada -- for the source shape files and a national *.RDS file for that level of geography
+  
+  - \bc_geography -- for all B.C. files (which are sub-sets of the national .RDS files)
+  
+  
+
+#### Example: Census Metropolitan Area
+
+File `lcma000b16a_e.zip` downloaded from [2016 Census - Boundary files](https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-2016-eng.cfm), after selecting "Census metropolitan areas and census agglomerations" in the "Cartographic Boundary File" column.
+
+This file is then saved to folder `\geography\cma_canada`, and unzipped.
+
+The following script will 
+ 
+ * open the file (using the {sf} package), 
+ 
+ * save it as an .RDS file in the above folder,
+ 
+ * filter only the B.C. regions (using the provincial code of "59"), and
+ 
+ * save the B.C. file in `\geography\bc_geography`.
+
+
+
 
 ``` r
-## basic example code
+
+# PACKAGES
+# the tidyverse
+library(dplyr)
+library(forcats)
+library(glue)
+
+# utilities
+library(here)
+
+# mapping
+library(sf)
+
+
+# read and save Canada file
+
+canada_cma <- st_read(here::here("geography", "cma_canada", "lcma_000b16a_e.shp"))
+
+saveRDS(canada_cma, here("geography", "cma_canada", "canada_cma.RDS"))
+
+# filter B.C. geography
+
+bc_cma <- 
+  canada_cma %>%
+  filter(PRUID == "59") %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+saveRDS(bc_cma, here("geography", "bc_geog", "bc_cma.RDS"))
+
 ```
 
 ### Project Status
