@@ -1,0 +1,207 @@
+---
+title: "create census shapefiles"
+output: html_notebook
+---
+
+
+## packages
+
+```{r}
+# the tidyverse
+library(dplyr)
+library(forcats)
+library(glue)
+
+# utilities
+library(here)
+here::here()
+library(feather)
+
+# mapping
+library(sf)
+
+
+```
+
+## test run: DA
+
+read file
+
+```{r}
+
+canada_da <- st_read(here::here("geography", "da_canada", "lda_000b16a_e.shp"))
+
+saveRDS(canada_da, here("geography", "da_canada", "canada_da.RDS"))
+
+
+```
+
+filter to just B.C.
+
+but wait, `PRUID` is a factor!
+
+* see https://stat545.com/block029_factors.html#dropping-unused-levels
+
+
+```{r}
+
+ls.str(canada_da)
+levels(canada_da$PRUID)
+
+fct_count(canada_da$PRUID)
+
+bc_da <- 
+  canada_da %>%
+  filter(PRUID == "59") 
+
+fct_count(bc_da$PRUID)
+
+bc_da <- 
+  bc_da %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+fct_count(bc_da$PRUID)
+
+
+```
+
+save as RDS file
+
+```{r}
+
+saveRDS(bc_da, here("geography", "geog_bc", "bc_da.RDS"))
+
+```
+
+
+```{r eval=FALSE}
+
+bc_da <- readRDS(here("geography", "geog_bc", "bc_da.RDS"))
+
+```
+
+## function
+
+
+run with Census Tract
+
+```{r}
+
+
+readgeofile <- function(geolevel){
+  sourcefile <- glue("l", geolevel, "_000b16a_e.shp")
+  st_read(here::here("geography", glue(geolevel, "_canada"), sourcefile))
+}
+
+geolevel <- "ct"
+
+assign(glue("canada_", geolevel), 
+       readgeofile(geolevel))
+
+saveRDS(glue("canada_", geolevel), 
+        here("geography", glue(geolevel, "_canada"), glue("canada_", geolevel, ".RDS")))
+
+
+```
+
+test read
+
+```{r eval=FALSE}
+
+readRDS(here("geography", glue(geolevel, "_canada"), glue("canada_", geolevel, ".RDS")))
+
+```
+
+
+```{r}
+# --- filter for B.C. values
+
+
+bc_ct <- 
+  canada_ct %>%
+  filter(PRUID == "59") %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+fct_count(bc_ct$PRUID)
+
+
+saveRDS(bc_ct, here("geography", "geog_bc", "bc_ct.RDS"))
+
+
+# -- function
+
+bcgeofile <- function(geolevel){
+  assign(df, glue("canada_", geolevel))
+  filter(df, PRUID == "59")
+}
+
+bcgeofile("ct")
+
+
+
+
+
+```
+
+
+```{r eval=FALSE}
+
+bc_ct <- readRDS(here("geography", "geog_bc", glue("bc_", ct, ".RDS"))
+
+```
+
+
+
+## Census Metropolitan Area (CMA)
+
+
+read file, filter to just B.C.
+
+```{r}
+
+canada_cma <- st_read(here::here("geography", "cma_canada", "lcma000b16a_e.shp"))
+
+saveRDS(canada_cma, here("geography", "cma_canada", "canada_cma"))
+
+
+ls.str(canada_cma)
+levels(canada_cma$PRUID)
+
+fct_count(canada_cma$PRUID)
+
+bc_cma <- 
+  canada_cma %>%
+  filter(PRUID == "59") 
+
+fct_count(bc_cma$PRUID)
+
+bc_cma <- 
+  bc_cma %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+fct_count(bc_cma$PRUID)
+
+
+saveRDS(bc_cma, here("geography", "geog_bc", "bc_cma.RDS"))
+
+```
+
+
+```{r eval=FALSE}
+
+bc_cma <- readRDS(here("geography", "geog_bc", "bc_cma.RDS"))
+
+
+```
+
+
+## Reference
+
+Statistics Canada, [Census: Geography](https://www12.statcan.gc.ca/census-recensement/2016/geo/index-eng.cfm)
+
+Statistics Canada, [Boundary files](https://www12.statcan.gc.ca/census-recensement/2011/geo/bound-limit/bound-limit-eng.cfm)
+
+* 2016, Dissemination area https://www150.statcan.gc.ca/n1/en/catalogue/92-169-X
+
+* 2016, Census tract 
+
