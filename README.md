@@ -25,7 +25,7 @@ Folder structure within this project is
 
   - \(geolevel)_canada -- for the source shape files and a national *.RDS file for that level of geography
   
-  - \bc_geography -- for all B.C. files (which are sub-sets of the national .RDS files)
+  - \bc_geog -- for all B.C. files (which are sub-sets of the national .RDS files)
   
   
 
@@ -43,7 +43,7 @@ The following script will
  
  * filter only the B.C. regions (using the provincial code of "59"), and
  
- * save the B.C. file in `\geography\bc_geography`.
+ * save the B.C. file in `\geography\bc_geog`.
 
 
 
