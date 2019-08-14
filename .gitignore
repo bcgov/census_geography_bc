@@ -34,3 +34,11 @@ vignettes/*.pdf
 
 # Shiny token, see https://shiny.rstudio.com/articles/shinyapps.html
 rsconnect/
+
+
+# project-specific files
+*.Rproj
+# all geo files--downloaded and output 
+/geography/
+# output from notebook
+*.html   
