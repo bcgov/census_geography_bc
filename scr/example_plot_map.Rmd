@@ -65,4 +65,19 @@ bc_csd %>%
 ```
 
 
+
+```{r}
+
+bc_da <- readRDS(here("geography", "bc_geog", "bc_da.RDS"))
+
+
+bc_da %>%
+  filter(CSDNAME == "Victoria") %>%
+  ggplot() +
+  geom_sf()
+
+
+
+```
+
 -30-
