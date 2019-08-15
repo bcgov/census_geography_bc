@@ -1,0 +1,68 @@
+---
+title: "B.C.: Map of Census Divisions"
+output: html_notebook
+---
+
+Load bc_cd.RDS file (conversion of Statistics Canada's boundary file), make map using {ggplot2}.
+
+
+```{r}
+
+# tidyverse
+library(ggplot2)
+library(dplyr)
+
+# mapping
+library(sf)
+
+# utilities
+library(here)
+
+```
+
+load file
+
+```{r}
+
+bc_cd <- readRDS(here("geography", "bc_geog", "bc_cd.RDS"))
+
+bc_cd$geometry
+
+```
+
+
+draw map
+
+```{r}
+
+ggplot(data = bc_cd) +
+  geom_sf()
+
+```
+
+## Census Sub-Divisions within one Census Metropolitan Area
+
+
+```{r}
+
+bc_csd <- readRDS(here("geography", "bc_geog", "bc_csd.RDS"))
+
+bc_csd$geometry
+
+```
+
+filter for Victoria CMA (CMA 935)
+
+```{r}
+
+bc_csd %>%
+  filter(CMAUID == "935") %>%
+  ggplot() +
+  geom_sf()
+
+```
+
+```
+
+
+-30-
