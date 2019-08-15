@@ -89,12 +89,43 @@ bc_da <- readRDS(here("geography", "bc_geog", "bc_da.RDS"))
 
 # -- function
 
+
+```{r}
+# --- filter for B.C. values
+
+
+bc_ct <- 
+  canada_ct %>%
+  filter(PRUID == "59") %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+fct_count(bc_ct$PRUID)
+
+
+saveRDS(bc_ct, here("geography", "bc_geog", "bc_ct.RDS"))
+
+
+# -- function
+
+# bcgeofile <- function(geolevel){
+#   assign(df, glue("canada_", geolevel))
+#   filter(PRUID == "59")
+# }
+# 
+# bcgeofile("ct")
+## error because function does not know what df is; df has not been set/called yet
+
+
 bcgeofile <- function(geolevel){
-  assign(df, glue("canada_", geolevel))
-  filter(df, PRUID == "59")
+  get(glue("canada_", geolevel)) %>%
+    filter(PRUID == "59")
 }
 
-bcgeofile("ct")
+df <- bcgeofile(geolevel)
+assign(x = glue("bc_", geolevel), df); rm(df)
+saveRDS(glue("bc_", geolevel), here("geography", "bc_geog", glue("bc_", geolevel, ".RDS")))
+
+```
 
 
 
