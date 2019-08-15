@@ -81,53 +81,10 @@ bc_da <- readRDS(here("geography", "bc_geog", "bc_da.RDS"))
 ## function
 
 
-run with Census Tract
-
-```{r}
 
 
-readgeofile <- function(geolevel){
-  sourcefile <- glue("l", geolevel, "_000b16a_e.shp")
-  st_read(here::here("geography", glue(geolevel, "_canada"), sourcefile))
-}
-
-geolevel <- "ct"
-
-assign(glue("canada_", geolevel), 
-       readgeofile(geolevel))
-
-geog_obj <- glue("canada_", geolevel)
-
-saveRDS(canada_ct, 
-        here("geography", glue(geolevel, "_canada"), glue(geog_obj, ".RDS")))
-
-# how can we use the `geo_obj` name to refer to the object of that name?
-# down this path lies enquo and bang-bang, or a twist on assign, or...
-
-```
-
-test read
 
 ```{r eval=FALSE}
-
-readRDS(here("geography", glue(geolevel, "_canada"), glue("canada_", geolevel, ".RDS")))
-
-```
-
-
-```{r}
-# --- filter for B.C. values
-
-
-bc_ct <- 
-  canada_ct %>%
-  filter(PRUID == "59") %>%
-  mutate(PRUID = fct_drop(PRUID))
-
-fct_count(bc_ct$PRUID)
-
-
-saveRDS(bc_ct, here("geography", "bc_geog", "bc_ct.RDS"))
 
 
 # -- function
@@ -146,55 +103,93 @@ bcgeofile("ct")
 ```
 
 
-```{r eval=FALSE}
 
-bc_ct <- readRDS(here("geography", "bc_geog", glue("bc_", ct, ".RDS"))
-
-```
-
-
-
-## Census Metropolitan Area (CMA)
+## Census Sub-Division (CSD)
 
 
 read file, filter to just B.C.
 
 ```{r}
 
-canada_cma <- st_read(here::here("geography", "cma_canada", "lcma000b16a_e.shp"))
-
-saveRDS(canada_cma, here("geography", "cma_canada", "canada_cma"))
+geolevel <- "csd"
 
 
-ls.str(canada_cma)
-levels(canada_cma$PRUID)
+readgeofile <- function(geolevel){
+  sourcefile <- glue("l", geolevel, "000b16a_e.shp")
+  st_read(here::here("geography", glue(geolevel, "_canada"), sourcefile))
+}
 
-fct_count(canada_cma$PRUID)
 
-bc_cma <- 
-  canada_cma %>%
-  filter(PRUID == "59") 
+assign(glue("canada_", geolevel), 
+       readgeofile(geolevel))
 
-fct_count(bc_cma$PRUID)
+geog_obj <- glue("canada_", geolevel)
 
-bc_cma <- 
-  bc_cma %>%
+saveRDS(canada_csd, 
+        here("geography", glue(geolevel, "_canada"), glue(geog_obj, ".RDS")))
+
+
+
+bc_csd <- 
+  canada_csd %>%
+  filter(PRUID == "59") %>%
   mutate(PRUID = fct_drop(PRUID))
 
-fct_count(bc_cma$PRUID)
+saveRDS(bc_ct, here("geography", "bc_geog", "bc_csd.RDS"))
 
 
-saveRDS(bc_cma, here("geography", "bc_geog", "bc_cma.RDS"))
+
+```
+
+
+
+### Census Division
+
+```{r}
+
+
+readgeofile <- function(geolevel){
+  sourcefile <- glue("l", geolevel, "_000b16a_e.shp")
+  st_read(here::here("geography", glue(geolevel, "_canada"), sourcefile))
+}
+
+geolevel <- "cd"
+
+assign(glue("canada_", geolevel), 
+       readgeofile(geolevel))
+
+geog_obj <- glue("canada_", geolevel)
+
+saveRDS(canada_cd, 
+        here("geography", glue(geolevel, "_canada"), glue(geog_obj, ".RDS")))
+
+# how can we use the `geo_obj` name to refer to the object of that name?
+# down this path lies enquo and bang-bang, or a twist on assign, or...
+# --- filter for B.C. values
+
+
+bc_cd <- 
+  canada_cd %>%
+  filter(PRUID == "59") %>%
+  mutate(PRUID = fct_drop(PRUID))
+
+fct_count(bc_cd$PRUID)
+
+
+saveRDS(bc_cd, here("geography", "bc_geog", "bc_cd.RDS"))
+
 
 ```
 
 
 ```{r eval=FALSE}
 
-bc_cma <- readRDS(here("geography", "bc_geog", "bc_cma.RDS"))
-
+bc_ct <- readRDS(here("geography", "bc_geog", "bc_ct.RDS"))
+bc_csd <- readRDS(here("geography", "bc_geog", "bc_csd.RDS"))
+bc_cd <- readRDS(here("geography", "bc_geog", "bc_cd.RDS"))
 
 ```
+
 
 
 ## Reference
