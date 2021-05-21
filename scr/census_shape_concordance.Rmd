@@ -1,0 +1,94 @@
+---
+title: 'Census: shape concordance'
+author: "Martin Monkman"
+date: "21/05/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(bcmaps)
+library(bcdata)
+
+library(sf)
+library(ggspatial)
+```
+
+## Census to other geographies
+
+In the file "create_census_shapefile.Rmd" we have a list of our R shapes. But what if we want to create a concordance (a.k.a. crosswalk) between Census geography and other administrative boundaries?
+
+
+## Provincial Electoral Districts
+
+https://catalogue.data.gov.bc.ca/dataset/current-provincial-electoral-districts-of-british-columbia
+
+```{r}
+bcdc_get_record("https://catalogue.data.gov.bc.ca/dataset/current-provincial-electoral-districts-of-british-columbia")
+```
+
+
+```{r}
+ed_shape <-  bcdc_query_geodata('050ec630-47dd-476b-b773-28b2f8d8bc98') %>% 
+  collect()
+
+head(ed_shape)
+
+```
+
+
+```{r}
+ggplot(ed_shape) +
+  geom_sf()
+```
+
+
+
+## Voting Areas
+
+In this example, we will create a table that lists all of the Voting Areas defined by Elections BC, and then joins them to the relevant B.C. Census Tracts.
+
+The Voting Area shape files are found here:
+https://catalogue.data.gov.bc.ca/dataset/provincial-electoral-district-voting-areas-gazetted-02-23-2017 
+
+Use the URL to get the information about the resource at that link:
+
+```{r}
+
+bcdc_get_record("https://catalogue.data.gov.bc.ca/dataset/provincial-electoral-district-voting-areas-gazetted-02-23-2017")
+
+```
+
+Now read the record, and save as an object:
+
+```{r}
+
+va_shape <- bcdc_query_geodata('f309df17-0462-40c0-bb11-b76c1cb83024') %>% 
+  collect()
+
+head(va_shape)
+
+```
+
+
+```{r}
+ggplot(va_shape) +
+  geom_sf()
+```
+
+
+
+
+
+
+
+## useful resources
+
+https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html#2
+
+https://bcgov.github.io/bcdata/articles/efficiently-query-spatial-data-in-the-bc-data-catalogue.html
+
+https://r-spatial.org/r/2018/10/25/ggplot2-sf.html
+
+https://r-spatial.github.io/sf/articles/sf5.html
