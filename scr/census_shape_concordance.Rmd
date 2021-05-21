@@ -35,6 +35,10 @@ ed_shape <-  bcdc_query_geodata('050ec630-47dd-476b-b773-28b2f8d8bc98') %>%
 
 head(ed_shape)
 
+
+unique(ed_shape$ED_NAME)
+
+
 ```
 
 
@@ -43,6 +47,64 @@ ggplot(ed_shape) +
   geom_sf()
 ```
 
+
+Oak Bay-Gordon Head riding:
+
+
+```{r}
+ed_shape %>% 
+  filter(ED_NAME == "Oak Bay-Gordon Head") %>% 
+  #
+  ggplot() +
+  geom_sf() 
+```
+
+Now, read in the Census Tract shapes (saved via "create_census_shapefile.Rmd")
+
+Note: need to add projection to this. For maps of BC, we use EPSG:3005, a.k.a. NAD83 / BC Albers
+https://spatialreference.org/ref/epsg/nad83-bc-albers/
+
+
+```{r}
+bc_ct <- readRDS(here::here("geography", "bc_geog", "bc_ct.RDS")) %>% 
+  collect() %>% 
+  st_transform(bc_ct, crs = "EPSG:3005")
+#
+# st_transform(bc_ct, crs = "EPSG:3005") 
+# could also be written
+# bcmaps::transform_bc_albers()
+#
+```
+
+(@bigbadsam says `bcmaps::transform_bc_albers()` is a helper shortcut)
+
+Now, make a map of the Census tracts in BC (the needs the provincial boundary!)
+
+```{r}
+ggplot(bc_ct) +
+    geom_sf()
+```
+
+
+Next, we join the PED shape file to the Census Tracts.
+
+
+```{r}
+
+ct_ed_shape <- st_join(bc_ct, ed_shape, left = TRUE)
+
+head(ct_ed_shape)
+
+```
+
+
+```{r}
+obgh <- ct_ed_shape %>% 
+  filter(ED_NAME == "Oak Bay-Gordon Head")
+
+ggplot(obgh) +
+  geom_sf()
+```
 
 
 ## Voting Areas
@@ -78,14 +140,36 @@ ggplot(va_shape) +
 ```
 
 
+```{r}
+ed_va_shape_join <- st_join(ed_shape, va_shape)
+head(ed_va_shape_join)
+```
 
 
+Next, we join the Voting Area shape file to the Census Tracts.
 
+
+```{r}
+
+va_ct_shape <- st_join(va_shape, bc_ct, left = TRUE)
+
+head(va_ct_shape)
+
+```
+
+
+write the file for future reference
+
+```{r}
+
+readr::write_rds(va_ct_shape, "va_ct_shape.rds")
+
+```
 
 
 ## useful resources
 
-https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html#2
+https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html
 
 https://bcgov.github.io/bcdata/articles/efficiently-query-spatial-data-in-the-bc-data-catalogue.html
 
