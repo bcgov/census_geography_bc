@@ -194,10 +194,40 @@ write the file for future reference
 
 ```{r}
 
-readr::write_rds(va_ct_shape, "va_ct_shape.rds")
+## write as RDS files
+#readr::write_rds(va_ct_shape, "va_ct_shape.rds")
 
+## read RDS file
+#va_ct_shape <- readr::read_rds("va_ct_shape.rds")
+
+#head(va_ct_shape)
 ```
 
+
+```{r}
+va_ct_shape %>% 
+  group_by(EDVA_CODE) %>% 
+  tally %>% 
+  arrange(desc(n))
+```
+
+### Oak Bay-Gordon Head
+
+filter for Oak Bay-Gordon Head
+
+```{r}
+va_obg <- va_ct_shape %>% 
+  filter(str_detect(EDVA_CODE, "^OBG"))
+
+head(va_obg)
+```
+
+
+
+```{r}
+ggplot(va_obg) +
+    geom_sf()
+```
 
 ## useful resources
 
