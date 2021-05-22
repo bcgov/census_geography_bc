@@ -122,13 +122,16 @@ We could also go the other direction, and use the `st_contains()`
 
 ```{r}
 
-ed_ct_shape_cont <- st_contains(ed_shape, bc_ct)
+ed_ct_cont <- st_contains(ed_shape, bc_ct)
+
+ed_ct_cont
 
 ```
 
+This isn't perfect. For example, the Oak Bay-Gordon Head riding is picking up CTs that are outside the riding. What's the reason?
 
 ```{r}
-obgh <- ct_ed_shape %>% 
+obgh <- ct_ed_left %>% 
   filter(ED_NAME == "Oak Bay-Gordon Head")
 
 ggplot(obgh) +
