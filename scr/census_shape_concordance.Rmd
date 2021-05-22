@@ -13,6 +13,8 @@ library(bcdata)
 
 library(sf)
 library(ggspatial)
+
+library(tidyverse)
 ```
 
 ## Census to other geographies
@@ -92,17 +94,37 @@ ggplot(bc_ct) +
 
 Next, we join the PED shape file to the Census Tracts. There are a variety of functions in the {sf} package that could be used.
 
+The `st_join()` function 
 
 ```{r}
 
-ct_ed_shape_left <- st_join(bc_ct, ed_shape, left = TRUE)
+ct_ed_left <- st_join(bc_ct, ed_shape, left = TRUE)
 
-ct_ed_shape_int <- st_intersects(bc_ct, ed_shape)
+ct_ed_left %>% 
+  group_by(CTUID) %>% 
+  tally() %>% 
+  arrange(desc(n))
+
+```
+
+`st_intersects()` returns a list. In this case, each of the 766 PEDs is an observation, and the join returns the number of the PEDs.
+
+```{r}
+
+ct_ed_int <- st_intersects(bc_ct, ed_shape)
+
+ct_ed_int[766]
 
 ```
 
 
 We could also go the other direction, and use the `st_contains()`
+
+```{r}
+
+ed_ct_shape_cont <- st_contains(ed_shape, bc_ct)
+
+```
 
 
 ```{r}
@@ -177,6 +199,8 @@ readr::write_rds(va_ct_shape, "va_ct_shape.rds")
 ## useful resources
 
 Sam Albers, [Introduction to Geometric Predicates and Operators](https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html)
+
+Robin Lovelace, Jakub Nowosad, Jannes Muenchow, [_Geocomputation with R_, 4 Spatial data operations](https://geocompr.robinlovelace.net/spatial-operations.html) (2021-04-06)
 
 {bcdata} vignettes:
 
