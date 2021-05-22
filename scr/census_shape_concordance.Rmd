@@ -17,17 +17,26 @@ library(ggspatial)
 
 ## Census to other geographies
 
-In the file "create_census_shapefile.Rmd" we have a list of our R shapes. But what if we want to create a concordance (a.k.a. crosswalk) between Census geography and other administrative boundaries?
+In the file "create_census_shapefile.Rmd" we have created R data files that contain the Canadian Census geographies, ready to use as {sf} files. But what if we want to create a concordance (a.k.a. crosswalk) between Census geography and other administrative boundaries?
 
+In this example, we will create a flat file with a list of all of the Provincial Electoral Districts (PEDs), and the Census Tracts within them.
 
 ## Provincial Electoral Districts
 
+The shape files with the current boundaries can be accessed through [the British Columbia Open Data catalogue](https://catalogue.data.gov.bc.ca/dataset?download_audience=Public), using the functions in the [{bcdata} package](https://bcgov.github.io/bcdata/):
+
+The current shape files are at this link:
 https://catalogue.data.gov.bc.ca/dataset/current-provincial-electoral-districts-of-british-columbia
+
+The full record can be accessed by pasting the URL into the function `bcdc_get_record()`
 
 ```{r}
 bcdc_get_record("https://catalogue.data.gov.bc.ca/dataset/current-provincial-electoral-districts-of-british-columbia")
 ```
 
+With the ID from the "Name" field, the next step is to use `bcdc_query_geodata()` to read in the data.
+
+Note that we need to use the `collect()` function to gather the various elements of the query into a single object.
 
 ```{r}
 ed_shape <-  bcdc_query_geodata('050ec630-47dd-476b-b773-28b2f8d8bc98') %>% 
@@ -35,12 +44,18 @@ ed_shape <-  bcdc_query_geodata('050ec630-47dd-476b-b773-28b2f8d8bc98') %>%
 
 head(ed_shape)
 
+```
 
+We now have an object with 87 rows, one for each of the PEDs. One of the variables contains the geographic shape information for the PED.
+
+```{r}
+# get the list of PED names
 unique(ed_shape$ED_NAME)
-
 
 ```
 
+
+The information can be used create a map, using the `geom_sf()` function within `ggplot()`.
 
 ```{r}
 ggplot(ed_shape) +
@@ -48,37 +63,24 @@ ggplot(ed_shape) +
 ```
 
 
-Oak Bay-Gordon Head riding:
-
-
-```{r}
-ed_shape %>% 
-  filter(ED_NAME == "Oak Bay-Gordon Head") %>% 
-  #
-  ggplot() +
-  geom_sf() 
-```
-
 Now, read in the Census Tract shapes (saved via "create_census_shapefile.Rmd")
 
-Note: need to add projection to this. For maps of BC, we use EPSG:3005, a.k.a. NAD83 / BC Albers
-https://spatialreference.org/ref/epsg/nad83-bc-albers/
+* Note: need to add projection to this object. For maps of British Columbia, we use [EPSG:3005, a.k.a. NAD83 / BC Albers](https://spatialreference.org/ref/epsg/nad83-bc-albers/)
+
+* The way to add the projection to our object is with the function `sf::st_transform(bc_ct, crs = "EPSG:3005")`.
+
+* There is a helper function in the {bcmaps} package to do the same thing: `bcmaps::transform_bc_albers()`
 
 
 ```{r}
 bc_ct <- readRDS(here::here("geography", "bc_geog", "bc_ct.RDS")) %>% 
   collect() %>% 
   st_transform(bc_ct, crs = "EPSG:3005")
-#
-# st_transform(bc_ct, crs = "EPSG:3005") 
-# could also be written
-# bcmaps::transform_bc_albers()
-#
+
 ```
 
-(@bigbadsam says `bcmaps::transform_bc_albers()` is a helper shortcut)
 
-Now, make a map of the Census tracts in BC (the needs the provincial boundary!)
+Now, make a map of the Census Tracts in BC (this needs the provincial boundary!) Here, we quickly see that while there are 766 Census Tracts (CTs) in British Columbia, they are used in urban areas—there are no CTs in rural parts of Canada.
 
 ```{r}
 ggplot(bc_ct) +
@@ -86,16 +88,21 @@ ggplot(bc_ct) +
 ```
 
 
-Next, we join the PED shape file to the Census Tracts.
+### The spatial join
+
+Next, we join the PED shape file to the Census Tracts. There are a variety of functions in the {sf} package that could be used.
 
 
 ```{r}
 
-ct_ed_shape <- st_join(bc_ct, ed_shape, left = TRUE)
+ct_ed_shape_left <- st_join(bc_ct, ed_shape, left = TRUE)
 
-head(ct_ed_shape)
+ct_ed_shape_int <- st_intersects(bc_ct, ed_shape)
 
 ```
+
+
+We could also go the other direction, and use the `st_contains()`
 
 
 ```{r}
@@ -169,10 +176,15 @@ readr::write_rds(va_ct_shape, "va_ct_shape.rds")
 
 ## useful resources
 
-https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html
+Sam Albers, [Introduction to Geometric Predicates and Operators](https://bcgov.github.io/bcgov-rstats-public-presentations/spatial-operators/slides.html)
 
-https://bcgov.github.io/bcdata/articles/efficiently-query-spatial-data-in-the-bc-data-catalogue.html
+{bcdata} vignettes:
 
-https://r-spatial.org/r/2018/10/25/ggplot2-sf.html
+* [Querying Spatial Data with bcdata](https://bcgov.github.io/bcdata/articles/efficiently-query-spatial-data-in-the-bc-data-catalogue.html)
 
-https://r-spatial.github.io/sf/articles/sf5.html
+{sf} vignettes:
+
+* Edzer Pebesma, [5. Plotting Simple Features](https://r-spatial.github.io/sf/articles/sf5.html)
+
+Mel Moreno & Mathieu Basille, [Drawing beautiful maps programmatically with R, sf and ggplot2 — Part 1: Basics](https://r-spatial.org/r/2018/10/25/ggplot2-sf.html) (2018-10-25)
+
